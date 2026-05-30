@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "game.h"
+#include "player.h"
 
 int main(void)
 {
@@ -9,14 +10,20 @@ int main(void)
     InitWindow(screenWidth, screenHeight, "Ze Pilintra");
     SetTargetFPS(60);
 
-    // Desabilita o fechamento automático com ESC
+    // Desabilita fechamento automático com ESC
     SetExitKey(KEY_NULL);
 
     GameScreen currentScreen = SCREEN_MENU;
 
+    Player player;
+    InitPlayer(&player);
+
     while (!WindowShouldClose())
     {
+        // =====================
         // UPDATE
+        // =====================
+
         switch (currentScreen)
         {
             case SCREEN_MENU:
@@ -26,22 +33,17 @@ int main(void)
                     currentScreen = SCREEN_GAME;
                 }
 
-                // ESC fecha o jogo quando estiver no menu
-                if (IsKeyPressed(KEY_ESCAPE))
-                {
-                    break;
-                }
-
                 break;
             }
 
             case SCREEN_GAME:
             {
-                // ESC volta para o menu
                 if (IsKeyPressed(KEY_ESCAPE))
                 {
                     currentScreen = SCREEN_MENU;
                 }
+
+                UpdatePlayer(&player);
 
                 break;
             }
@@ -52,7 +54,10 @@ int main(void)
             }
         }
 
+        // =====================
         // DRAW
+        // =====================
+
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
@@ -64,18 +69,32 @@ int main(void)
                 DrawText("ZE PILINTRA", 400, 180, 60, BLACK);
                 DrawText("ENTER - Iniciar", 450, 320, 30, DARKGRAY);
                 DrawText("Versao 0.1", 20, 680, 20, GRAY);
+
                 break;
             }
 
             case SCREEN_GAME:
             {
-                DrawText("FASE 1 - NÃO SEI AINDA", 420, 180, 50, BLACK);
+                DrawText("FASE 1 - AINDA NÃO SEI", 20, 20, 30, BLACK);
+
+                // Chão
+                DrawRectangle(
+                    0,
+                    600,
+                    screenWidth,
+                    120,
+                    DARKGREEN
+                );
+
+                DrawPlayer(player);
+
                 break;
             }
 
             case SCREEN_PAUSE:
             {
                 DrawText("PAUSADO", 500, 200, 50, BLACK);
+
                 break;
             }
         }
