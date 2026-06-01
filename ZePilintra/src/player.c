@@ -1,4 +1,5 @@
 #include "player.h"
+#include "stats.h"
 #include "map.h"
 
 #define GRAVITY 0.5f
@@ -15,10 +16,13 @@ void InitPlayer(Player *player)
     player->velocityY = 0.0f;
 
     player->isGrounded = true;
+
+    InitStats(&player->stats);
 }
 
 void UpdatePlayer(Player *player)
 {
+    // Movimento horizontal
     if (IsKeyDown(KEY_A))
     {
         player->body.x -= player->speed;
@@ -29,12 +33,14 @@ void UpdatePlayer(Player *player)
         player->body.x += player->speed;
     }
 
+    // Pulo
     if (IsKeyPressed(KEY_SPACE) && player->isGrounded)
     {
         player->velocityY = player->jumpForce;
         player->isGrounded = false;
     }
 
+    // Gravidade
     player->velocityY += GRAVITY;
     player->body.y += player->velocityY;
 

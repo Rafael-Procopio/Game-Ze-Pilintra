@@ -2,6 +2,7 @@
 #include "game.h"
 #include "player.h"
 #include "map.h"
+#include "stats.h"
 
 int main(void)
 {
@@ -59,6 +60,12 @@ int main(void)
                     currentScreen = SCREEN_MENU;
                 }
 
+                // TESTE DE XP
+                if (IsKeyPressed(KEY_K))
+                {
+                    AddXP(&player.stats, 50);
+                }
+
                 UpdatePlayer(&player);
 
                 camera.target = (Vector2){
@@ -80,6 +87,7 @@ int main(void)
         // =====================
 
         BeginDrawing();
+
         ClearBackground(SKYBLUE);
 
         switch (currentScreen)
@@ -104,6 +112,70 @@ int main(void)
                 EndMode2D();
 
                 DrawText("FASE 1 - LAPA", 20, 20, 30, BLACK);
+
+                DrawText(
+                    TextFormat("Nivel: %i",
+                    player.stats.level),
+                    20,
+                    60,
+                    20,
+                    BLACK
+                );
+
+                DrawText(
+                    TextFormat("XP: %i/%i",
+                    player.stats.xp,
+                    player.stats.xpToNextLevel),
+                    20,
+                    90,
+                    20,
+                    BLACK
+                );
+
+                DrawText(
+                    TextFormat("HP: %i/%i",
+                    player.stats.hp,
+                    player.stats.maxHp),
+                    20,
+                    120,
+                    20,
+                    BLACK
+                );
+
+                DrawText(
+                    TextFormat("Ataque: %i",
+                    player.stats.attack),
+                    20,
+                    150,
+                    20,
+                    BLACK
+                );
+
+                DrawText(
+                    TextFormat("Defesa: %i",
+                    player.stats.defense),
+                    20,
+                    180,
+                    20,
+                    BLACK
+                );
+
+                DrawText(
+                    TextFormat("Skill Points: %i",
+                    player.stats.skillPoints),
+                    20,
+                    210,
+                    20,
+                    BLACK
+                );
+
+                DrawText(
+                    "K = Ganhar XP",
+                    20,
+                    250,
+                    20,
+                    DARKGRAY
+                );
 
                 break;
             }

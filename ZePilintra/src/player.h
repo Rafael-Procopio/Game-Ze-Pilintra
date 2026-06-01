@@ -2,14 +2,20 @@
 #define PLAYER_H
 
 #include "raylib.h"
+#include "stats.h"
 
 typedef struct
 {
     Rectangle body;
+
     float speed;
     float jumpForce;
     float velocityY;
+
     bool isGrounded;
+
+    Stats stats;
+
 } Player;
 
 void InitPlayer(Player *player);
