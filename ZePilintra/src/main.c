@@ -9,14 +9,27 @@ int main(void)
 
     InitWindow(screenWidth, screenHeight, "Ze Pilintra");
     SetTargetFPS(60);
-
-    // Desabilita fechamento automático com ESC
     SetExitKey(KEY_NULL);
 
     GameScreen currentScreen = SCREEN_MENU;
 
     Player player;
     InitPlayer(&player);
+
+    Camera2D camera = { 0 };
+
+    camera.target = (Vector2){
+        player.body.x + player.body.width / 2,
+        player.body.y + player.body.height / 2
+    };
+
+    camera.offset = (Vector2){
+        screenWidth / 2.0f,
+        screenHeight / 2.0f
+    };
+
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
 
     while (!WindowShouldClose())
     {
@@ -45,6 +58,11 @@ int main(void)
 
                 UpdatePlayer(&player);
 
+                camera.target = (Vector2){
+                    player.body.x + player.body.width / 2,
+                    player.body.y + player.body.height / 2
+                };
+
                 break;
             }
 
@@ -59,8 +77,7 @@ int main(void)
         // =====================
 
         BeginDrawing();
-
-        ClearBackground(RAYWHITE);
+        ClearBackground(SKYBLUE);
 
         switch (currentScreen)
         {
@@ -75,18 +92,33 @@ int main(void)
 
             case SCREEN_GAME:
             {
-                DrawText("FASE 1 - AINDA NÃO SEI", 20, 20, 30, BLACK);
+                BeginMode2D(camera);
 
-                // Chão
+                // Chão principal
                 DrawRectangle(
                     0,
                     600,
-                    screenWidth,
+                    4000,
                     120,
                     DARKGREEN
                 );
 
+                // Plataformas
+                DrawRectangle(400, 500, 200, 30, BROWN);
+
+                DrawRectangle(900, 420, 200, 30, BROWN);
+
+                DrawRectangle(1500, 350, 250, 30, BROWN);
+
+                DrawRectangle(2200, 450, 200, 30, BROWN);
+
+                DrawRectangle(3000, 300, 300, 30, BROWN);
+
                 DrawPlayer(player);
+
+                EndMode2D();
+
+                DrawText("FASE 1 - LAPA", 20, 20, 30, BLACK);
 
                 break;
             }
