@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "game.h"
 #include "player.h"
+#include "map.h"
 
 int main(void)
 {
@@ -15,6 +16,8 @@ int main(void)
 
     Player player;
     InitPlayer(&player);
+
+    InitMap();
 
     Camera2D camera = { 0 };
 
@@ -94,25 +97,7 @@ int main(void)
             {
                 BeginMode2D(camera);
 
-                // Chão principal
-                DrawRectangle(
-                    0,
-                    600,
-                    4000,
-                    120,
-                    DARKGREEN
-                );
-
-                // Plataformas
-                DrawRectangle(400, 500, 200, 30, BROWN);
-
-                DrawRectangle(900, 420, 200, 30, BROWN);
-
-                DrawRectangle(1500, 350, 250, 30, BROWN);
-
-                DrawRectangle(2200, 450, 200, 30, BROWN);
-
-                DrawRectangle(3000, 300, 300, 30, BROWN);
+                DrawMap();
 
                 DrawPlayer(player);
 
