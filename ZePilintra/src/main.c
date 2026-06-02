@@ -41,10 +41,6 @@ int main(void)
 
     while (!WindowShouldClose())
     {
-        // =====================
-        // UPDATE
-        // =====================
-
         switch (currentScreen)
         {
             case SCREEN_MENU:
@@ -64,10 +60,26 @@ int main(void)
                     currentScreen = SCREEN_MENU;
                 }
 
-                // TESTE DE XP
+                // XP de teste
                 if (IsKeyPressed(KEY_K))
                 {
                     AddXP(&player.stats, 50);
+                }
+
+                // Sistema de upgrades
+                if (IsKeyPressed(KEY_ONE))
+                {
+                    UpgradeAttack(&player.stats);
+                }
+
+                if (IsKeyPressed(KEY_TWO))
+                {
+                    UpgradeDefense(&player.stats);
+                }
+
+                if (IsKeyPressed(KEY_THREE))
+                {
+                    UpgradeMaxHp(&player.stats);
                 }
 
                 UpdatePlayer(&player);
@@ -81,7 +93,7 @@ int main(void)
                     }
                 );
 
-                // DANO DO INIMIGO
+                // Dano do inimigo
                 if (enemy.alive &&
                     CheckCollisionRecs(player.body, enemy.body))
                 {
@@ -93,7 +105,7 @@ int main(void)
                     }
                 }
 
-                // ATAQUE DO JOGADOR
+                // Ataque do jogador
                 if (IsKeyPressed(KEY_J))
                 {
                     if (enemy.alive &&
@@ -125,11 +137,8 @@ int main(void)
             }
         }
 
-        // =====================
-        // DRAW
-        // =====================
-
         BeginDrawing();
+
         ClearBackground(SKYBLUE);
 
         switch (currentScreen)
@@ -237,6 +246,30 @@ int main(void)
                     DARKGRAY
                 );
 
+                DrawText(
+                    "1 = +Ataque",
+                    20,
+                    350,
+                    20,
+                    DARKBLUE
+                );
+
+                DrawText(
+                    "2 = +Defesa",
+                    20,
+                    380,
+                    20,
+                    DARKBLUE
+                );
+
+                DrawText(
+                    "3 = +HP Max",
+                    20,
+                    410,
+                    20,
+                    DARKBLUE
+                );
+
                 if (enemy.alive)
                 {
                     DrawText(
@@ -253,7 +286,7 @@ int main(void)
                 else
                 {
                     DrawText(
-                        "Enemy Respawn: 5s",
+                        "Enemy Respawning...",
                         20,
                         320,
                         20,

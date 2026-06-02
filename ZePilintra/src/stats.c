@@ -31,3 +31,32 @@ void AddXP(Stats *stats, int amount)
         stats->xpToNextLevel += 50;
     }
 }
+
+void UpgradeAttack(Stats *stats)
+{
+    if (stats->skillPoints <= 0)
+        return;
+
+    stats->attack++;
+    stats->skillPoints--;
+}
+
+void UpgradeDefense(Stats *stats)
+{
+    if (stats->skillPoints <= 0)
+        return;
+
+    stats->defense++;
+    stats->skillPoints--;
+}
+
+void UpgradeMaxHp(Stats *stats)
+{
+    if (stats->skillPoints <= 0)
+        return;
+
+    stats->maxHp += 10;
+    stats->hp += 10;
+
+    stats->skillPoints--;
+}

@@ -15,9 +15,14 @@ typedef struct
     int defense;
 
     int skillPoints;
+
 } Stats;
 
 void InitStats(Stats *stats);
 void AddXP(Stats *stats, int amount);
+
+void UpgradeAttack(Stats *stats);
+void UpgradeDefense(Stats *stats);
+void UpgradeMaxHp(Stats *stats);
 
 #endif
