@@ -14,10 +14,14 @@ typedef struct
 
     float respawnTimer;
 
+    float speed;
+
+    int direction;
+
 } Enemy;
 
 void InitEnemy(Enemy *enemy);
-void UpdateEnemy(Enemy *enemy);
+void UpdateEnemy(Enemy *enemy, Vector2 playerPos);
 void DrawEnemy(Enemy enemy);
 
 #endif

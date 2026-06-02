@@ -71,9 +71,29 @@ int main(void)
                 }
 
                 UpdatePlayer(&player);
-                UpdateEnemy(&enemy);
 
-                // ATAQUE
+                UpdateEnemy(
+                    &enemy,
+                    (Vector2)
+                    {
+                        player.body.x,
+                        player.body.y
+                    }
+                );
+
+                // DANO DO INIMIGO
+                if (enemy.alive &&
+                    CheckCollisionRecs(player.body, enemy.body))
+                {
+                    player.stats.hp--;
+
+                    if (player.stats.hp < 0)
+                    {
+                        player.stats.hp = 0;
+                    }
+                }
+
+                // ATAQUE DO JOGADOR
                 if (IsKeyPressed(KEY_J))
                 {
                     if (enemy.alive &&
@@ -228,6 +248,16 @@ int main(void)
                         320,
                         20,
                         RED
+                    );
+                }
+                else
+                {
+                    DrawText(
+                        "Enemy Respawn: 5s",
+                        20,
+                        320,
+                        20,
+                        GRAY
                     );
                 }
 
