@@ -122,6 +122,10 @@ int main(void)
                     }
                 }
 
+                if (player.stats.hp <= 0){
+                    currentScreen = SCREEN_GAMEOVER;
+                }
+
                 // Ataque do jogador
                 if (IsKeyPressed(KEY_J))
                 {
@@ -156,6 +160,24 @@ int main(void)
                     player.body.x + player.body.width / 2,
                     player.body.y + player.body.height / 2
                 };
+
+                break;
+            }
+
+            case SCREEN_GAMEOVER:
+            {
+                if (IsKeyPressed(KEY_ENTER))
+                {
+                    InitPlayer(&player);
+
+                    InitEnemy(&enemies[0], 800, 540);
+                    InitEnemy(&enemies[1], 1200, 540);
+                    InitEnemy(&enemies[2], 1700, 540);
+                    InitEnemy(&enemies[3], 2200, 540);
+                    InitEnemy(&enemies[4], 2800, 540);
+
+                    currentScreen = SCREEN_MENU;
+                }
 
                 break;
             }
@@ -322,6 +344,27 @@ int main(void)
                     450,
                     20,
                     RED
+                );
+
+                break;
+            }
+
+            case SCREEN_GAMEOVER:
+            {
+                DrawText(
+                    "GAME OVER",
+                    420,
+                    220,
+                    70,
+                    RED
+                );
+
+                DrawText(
+                    "Press ENTER to return",
+                    400,
+                    330,
+                    30,
+                    DARKGRAY
                 );
 
                 break;
