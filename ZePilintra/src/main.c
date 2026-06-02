@@ -19,8 +19,13 @@ int main(void)
     Player player;
     InitPlayer(&player);
 
-    Enemy enemy;
-    InitEnemy(&enemy);
+    Enemy enemies[MAX_ENEMIES];
+
+    InitEnemy(&enemies[0], 800, 540);
+    InitEnemy(&enemies[1], 1200, 540);
+    InitEnemy(&enemies[2], 1700, 540);
+    InitEnemy(&enemies[3], 2200, 540);
+    InitEnemy(&enemies[4], 2800, 540);
 
     InitMap();
 
@@ -84,41 +89,65 @@ int main(void)
 
                 UpdatePlayer(&player);
 
-                UpdateEnemy(
-                    &enemy,
-                    (Vector2)
-                    {
-                        player.body.x,
-                        player.body.y
-                    }
-                );
-
-                // Dano do inimigo
-                if (enemy.alive &&
-                    CheckCollisionRecs(player.body, enemy.body))
+                // Atualiza todos os inimigos
+                for (int i = 0; i < MAX_ENEMIES; i++)
                 {
-                    player.stats.hp--;
+                    UpdateEnemy(
+                        &enemies[i],
+                        (Vector2)
+                        {
+                            player.body.x,
+                            player.body.y
+                        }
+                    );
+                }
 
-                    if (player.stats.hp < 0)
+                // Dano recebido dos inimigos
+                for (int i = 0; i < MAX_ENEMIES; i++)
+                {
+                    if (
+                        enemies[i].alive &&
+                        CheckCollisionRecs(
+                            player.body,
+                            enemies[i].body
+                        )
+                    )
                     {
-                        player.stats.hp = 0;
+                        player.stats.hp--;
+
+                        if (player.stats.hp < 0)
+                        {
+                            player.stats.hp = 0;
+                        }
                     }
                 }
 
                 // Ataque do jogador
                 if (IsKeyPressed(KEY_J))
                 {
-                    if (enemy.alive &&
-                        CheckCollisionRecs(player.body, enemy.body))
+                    for (int i = 0; i < MAX_ENEMIES; i++)
                     {
-                        enemy.hp -= player.stats.attack;
-
-                        if (enemy.hp <= 0)
+                        if (
+                            enemies[i].alive &&
+                            CheckCollisionRecs(
+                                player.body,
+                                enemies[i].body
+                            )
+                        )
                         {
-                            enemy.alive = false;
-                            enemy.respawnTimer = 5.0f;
+                            enemies[i].hp -= player.stats.attack;
 
-                            AddXP(&player.stats, 50);
+                            if (enemies[i].hp <= 0)
+                            {
+                                enemies[i].alive = false;
+
+                                enemies[i].respawnTimer = 5.0f;
+
+                                AddXP(
+                                    &player.stats,
+                                    50
+                                );
+                            }
                         }
                     }
                 }
@@ -159,7 +188,11 @@ int main(void)
                 DrawMap();
 
                 DrawPlayer(player);
-                DrawEnemy(enemy);
+
+                for (int i = 0; i < MAX_ENEMIES; i++)
+                {
+                    DrawEnemy(enemies[i]);
+                }
 
                 EndMode2D();
 
@@ -270,29 +303,26 @@ int main(void)
                     DARKBLUE
                 );
 
-                if (enemy.alive)
+                int aliveEnemies = 0;
+
+                for (int i = 0; i < MAX_ENEMIES; i++)
                 {
-                    DrawText(
-                        TextFormat(
-                            "Enemy HP: %i",
-                            enemy.hp
-                        ),
-                        20,
-                        320,
-                        20,
-                        RED
-                    );
+                    if (enemies[i].alive)
+                    {
+                        aliveEnemies++;
+                    }
                 }
-                else
-                {
-                    DrawText(
-                        "Enemy Respawning...",
-                        20,
-                        320,
-                        20,
-                        GRAY
-                    );
-                }
+
+                DrawText(
+                    TextFormat(
+                        "Enemies Alive: %i",
+                        aliveEnemies
+                    ),
+                    20,
+                    450,
+                    20,
+                    RED
+                );
 
                 break;
             }

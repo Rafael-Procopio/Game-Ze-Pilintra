@@ -1,8 +1,18 @@
 #include "enemy.h"
 
-void InitEnemy(Enemy *enemy)
+void InitEnemy(
+    Enemy *enemy,
+    float x,
+    float y
+)
 {
-    enemy->body = (Rectangle){800, 540, 50, 60};
+    enemy->body = (Rectangle)
+    {
+        x,
+        y,
+        50,
+        60
+    };
 
     enemy->hp = 30;
     enemy->maxHp = 30;

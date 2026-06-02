@@ -3,6 +3,8 @@
 
 #include "raylib.h"
 
+#define MAX_ENEMIES 5
+
 typedef struct
 {
     Rectangle body;
@@ -20,8 +22,13 @@ typedef struct
 
 } Enemy;
 
-void InitEnemy(Enemy *enemy);
-void UpdateEnemy(Enemy *enemy, Vector2 playerPos);
+void InitEnemy(Enemy *enemy, float x, float y);
+
+void UpdateEnemy(
+    Enemy *enemy,
+    Vector2 playerPos
+);
+
 void DrawEnemy(Enemy enemy);
 
 #endif
