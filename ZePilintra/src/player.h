@@ -14,6 +14,8 @@ typedef struct
 
     bool isGrounded;
 
+    int facingRight;
+
     Stats stats;
 
 } Player;

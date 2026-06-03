@@ -17,6 +17,8 @@ void InitPlayer(Player *player)
 
     player->isGrounded = true;
 
+    player->facingRight = 1;
+
     InitStats(&player->stats);
 }
 
@@ -26,11 +28,13 @@ void UpdatePlayer(Player *player)
     if (IsKeyDown(KEY_A))
     {
         player->body.x -= player->speed;
+        player->facingRight = 0;
     }
 
     if (IsKeyDown(KEY_D))
     {
         player->body.x += player->speed;
+        player->facingRight = 1;
     }
 
     // Pulo

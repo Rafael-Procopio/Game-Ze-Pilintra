@@ -4,6 +4,7 @@
 #include "map.h"
 #include "stats.h"
 #include "enemy.h"
+#include "combat.h"
 
 int main(void)
 {
@@ -43,6 +44,10 @@ int main(void)
 
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
+
+    // Debug visualization timer for attack hitbox
+    float debugHitboxTimer = 0.0f;
+    float debugHitboxDuration = 0.3f;
 
     while (!WindowShouldClose())
     {
@@ -126,15 +131,20 @@ int main(void)
                     currentScreen = SCREEN_GAMEOVER;
                 }
 
-                // Ataque do jogador
+                // Ataque do jogador usando hitbox
                 if (IsKeyPressed(KEY_J))
                 {
+                    Rectangle attackHitbox = CreateAttackHitbox(player.body, player.facingRight);
+                    
+                    // Activate debug visualization
+                    debugHitboxTimer = debugHitboxDuration;
+
                     for (int i = 0; i < MAX_ENEMIES; i++)
                     {
                         if (
                             enemies[i].alive &&
                             CheckCollisionRecs(
-                                player.body,
+                                attackHitbox,
                                 enemies[i].body
                             )
                         )
@@ -154,6 +164,12 @@ int main(void)
                             }
                         }
                     }
+                }
+
+                // Update debug visualization timer
+                if (debugHitboxTimer > 0)
+                {
+                    debugHitboxTimer -= GetFrameTime();
                 }
 
                 camera.target = (Vector2){
@@ -216,9 +232,16 @@ int main(void)
                     DrawEnemy(enemies[i]);
                 }
 
+                // Debug visualization of attack hitbox
+                if (debugHitboxTimer > 0)
+                {
+                    Rectangle debugHitbox = CreateAttackHitbox(player.body, player.facingRight);
+                    DrawRectangleRec(debugHitbox, GREEN);
+                }
+
                 EndMode2D();
 
-                DrawText("FASE 1 - LAPA", 20, 20, 30, BLACK);
+                DrawText("FASE 1 - NÃO SEI", 20, 20, 30, BLACK);
 
                 DrawText(
                     TextFormat("Nivel: %i", player.stats.level),
