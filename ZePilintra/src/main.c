@@ -134,6 +134,12 @@ int main(void)
                 // Ataque do jogador usando hitbox
                 if (IsKeyPressed(KEY_J))
                 {
+                    // Trigger attack animation
+                    player.animationState = PLAYER_ATTACK;
+                    player.currentFrame = 0;
+                    player.frameCounter = 0;
+                    player.attackTimer = 0.25f;
+
                     Rectangle attackHitbox = CreateAttackHitbox(player.body, player.facingRight);
                     
                     // Activate debug visualization
@@ -184,6 +190,7 @@ int main(void)
             {
                 if (IsKeyPressed(KEY_ENTER))
                 {
+                    UnloadPlayer(&player);
                     InitPlayer(&player);
 
                     InitEnemy(&enemies[0], 800, 540);
@@ -409,6 +416,8 @@ int main(void)
 
         EndDrawing();
     }
+
+    UnloadPlayer(&player);
 
     CloseWindow();
 

@@ -4,6 +4,13 @@
 #include "raylib.h"
 #include "stats.h"
 
+typedef enum
+{
+    PLAYER_IDLE,
+    PLAYER_RUN,
+    PLAYER_ATTACK
+} PlayerAnimationState;
+
 typedef struct
 {
     Rectangle body;
@@ -16,6 +23,17 @@ typedef struct
 
     int facingRight;
 
+    Texture2D texture;
+
+    Rectangle frameRec;
+
+    int currentFrame;
+    int frameCounter;
+
+    int animationState;
+
+    float attackTimer;
+
     Stats stats;
 
 } Player;
@@ -23,5 +41,6 @@ typedef struct
 void InitPlayer(Player *player);
 void UpdatePlayer(Player *player);
 void DrawPlayer(Player player);
+void UnloadPlayer(Player *player);
 
 #endif
