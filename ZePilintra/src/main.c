@@ -19,6 +19,7 @@ int main(void)
 
     GameScreen currentScreen = SCREEN_MENU;
     bool inventoryOpen = false;
+    bool godMode = false;
 
     Player player;
     InitPlayer(&player);
@@ -95,6 +96,15 @@ int main(void)
                     AddItem(&player.inventory, "Iron Sword", 1);
                 }
 
+                if (IsKeyPressed(KEY_F10))
+                {
+                    godMode = !godMode;
+                    if (godMode && player.stats.hp <= 0)
+                    {
+                        player.stats.hp = 1;
+                    }
+                }
+
                 // XP de teste
                 if (IsKeyPressed(KEY_K))
                 {
@@ -143,16 +153,20 @@ int main(void)
                         )
                     )
                     {
-                        player.stats.hp -= enemies[i].damage;
-
-                        if (player.stats.hp < 0)
+                        if (!godMode)
                         {
-                            player.stats.hp = 0;
+                            player.stats.hp -= enemies[i].damage;
+
+                            if (player.stats.hp < 0)
+                            {
+                                player.stats.hp = 0;
+                            }
                         }
                     }
                 }
 
-                if (player.stats.hp <= 0){
+                if (!godMode && player.stats.hp <= 0)
+                {
                     currentScreen = SCREEN_GAMEOVER;
                 }
 
@@ -193,7 +207,10 @@ int main(void)
                                     enemies[i].xpReward
                                 );
 
-                                GenerateEnemyDrops(&player.inventory);
+                                GenerateDropsByEnemyType(
+                                    enemies[i].type,
+                                    &player.inventory
+                                );
                             }
                         }
                     }
@@ -400,6 +417,22 @@ int main(void)
                     DARKGRAY
                 );
 
+                DrawText(
+                    "F10 = Toggle God Mode",
+                    20,
+                    580,
+                    20,
+                    DARKBLUE
+                );
+
+                DrawText(
+                    TextFormat("God Mode: %s", godMode ? "ON" : "OFF"),
+                    20,
+                    610,
+                    20,
+                    godMode ? GREEN : RED
+                );
+
                 int aliveEnemies = 0;
                 int goblinsAlive = 0;
                 int banditsAlive = 0;
@@ -482,6 +515,7 @@ int main(void)
                 }
 
                 DrawDropNotification();
+                DrawDropDebugPanel();
 
                 break;
             }

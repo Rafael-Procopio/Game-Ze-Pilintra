@@ -2,8 +2,9 @@
 #define DROPS_H
 
 #include "inventory.h"
+#include "enemy.h"
 
-#define DROP_NOTIFICATION_TEXT_LENGTH 100
+#define DROP_NOTIFICATION_TEXT_LENGTH 256
 
 typedef struct
 {
@@ -18,11 +19,13 @@ typedef struct
     int chance;
     int minQuantity;
     int maxQuantity;
-} Drop;
+} DropEntry;
 
 void InitDropNotification(void);
-void GenerateEnemyDrops(Inventory *inventory);
+void GenerateDropsByEnemyType(EnemyType enemyType, Inventory *inventory);
 void UpdateDropNotification(float delta);
 void DrawDropNotification(void);
+void DrawDropDebugPanel(void);
+Color GetItemRarityColor(const char *itemName);
 
 #endif // DROPS_H
