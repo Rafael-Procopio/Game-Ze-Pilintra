@@ -93,12 +93,15 @@ void UpdateEnemy(Enemy *enemy, Vector2 playerPos)
 {
     if (!enemy->alive)
     {
-        enemy->respawnTimer -= GetFrameTime();
-
-        if (enemy->respawnTimer <= 0)
+        // Only respawn if a positive respawn timer was set
+        if (enemy->respawnTimer > 0.0f)
         {
-            enemy->alive = true;
-            enemy->hp = enemy->maxHp;
+            enemy->respawnTimer -= GetFrameTime();
+            if (enemy->respawnTimer <= 0.0f)
+            {
+                enemy->alive = true;
+                enemy->hp = enemy->maxHp;
+            }
         }
 
         return;

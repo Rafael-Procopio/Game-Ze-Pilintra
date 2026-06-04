@@ -8,6 +8,7 @@
 #include "stats.h"
 #include "enemy.h"
 #include "combat.h"
+#include "wave.h"
 
 int main(void)
 {
@@ -30,12 +31,9 @@ int main(void)
     InitDropNotification();
 
     Enemy enemies[MAX_ENEMIES];
-
-    InitEnemy(&enemies[0], 800, 540, ENEMY_GOBLIN);
-    InitEnemy(&enemies[1], 1200, 540, ENEMY_BANDIT);
-    InitEnemy(&enemies[2], 1700, 540, ENEMY_SKELETON);
-    InitEnemy(&enemies[3], 2200, 540, ENEMY_ELITE);
-    InitEnemy(&enemies[4], 2800, 540, ENEMY_GOBLIN);
+    WaveSystem wave;
+    InitWaveSystem(&wave);
+    StartWave(&wave, 1, enemies);
 
     InitMap();
 
@@ -147,6 +145,12 @@ int main(void)
                     {
                         player.stats.hp = 1;
                     }
+                }
+
+                // Wave skip (debug)
+                if (IsKeyPressed(KEY_F9))
+                {
+                    Wave_SkipCurrent(&wave);
                 }
 
                 if (inventoryOpen)
@@ -323,18 +327,12 @@ int main(void)
                             if (enemies[i].hp <= 0)
                             {
                                 enemies[i].alive = false;
+                                enemies[i].respawnTimer = 0.0f; // don't auto-respawn in wave mode
 
-                                enemies[i].respawnTimer = 5.0f;
+                                AddXP(&player.stats, enemies[i].xpReward);
+                                GenerateDropsByEnemyType(enemies[i].type, &player.inventory);
 
-                                AddXP(
-                                    &player.stats,
-                                    enemies[i].xpReward
-                                );
-
-                                GenerateDropsByEnemyType(
-                                    enemies[i].type,
-                                    &player.inventory
-                                );
+                                Wave_NotifyEnemyDefeated(&wave, enemies[i].type, &player);
                             }
                         }
                     }
@@ -354,6 +352,7 @@ int main(void)
                 UpdateDropNotification(GetFrameTime());
                 UpdateEquipmentNotification(GetFrameTime());
                 UpdateHealEffects(GetFrameTime());
+                UpdateWaveSystem(&wave, GetFrameTime(), enemies, &player);
 
                 break;
             }
@@ -365,11 +364,9 @@ int main(void)
                     UnloadPlayer(&player);
                     InitPlayer(&player);
 
-                    InitEnemy(&enemies[0], 800, 540, ENEMY_GOBLIN);
-                    InitEnemy(&enemies[1], 1200, 540, ENEMY_BANDIT);
-                    InitEnemy(&enemies[2], 1700, 540, ENEMY_SKELETON);
-                    InitEnemy(&enemies[3], 2200, 540, ENEMY_ELITE);
-                    InitEnemy(&enemies[4], 2800, 540, ENEMY_GOBLIN);
+                    // Reset wave system to start from wave 1
+                    InitWaveSystem(&wave);
+                    StartWave(&wave, 1, enemies);
 
                     currentScreen = SCREEN_MENU;
                 }
@@ -672,6 +669,9 @@ int main(void)
                     DrawEquipmentBonusPanel(&player.equipment);
                     DrawCharacterPanel(&player);
                 }
+
+                DrawWaveHUD(&wave);
+                DrawWaveAnnouncement(&wave);
 
                 DrawDropNotification();
                 DrawDropDebugPanel();
