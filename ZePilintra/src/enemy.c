@@ -1,9 +1,35 @@
 #include "enemy.h"
+#include <stdio.h>
+
+static const char *GetEnemyTypeName(EnemyType type)
+{
+    switch (type)
+    {
+        case ENEMY_GOBLIN: return "Goblin";
+        case ENEMY_BANDIT: return "Bandit";
+        case ENEMY_SKELETON: return "Skeleton";
+        case ENEMY_ELITE: return "Elite";
+        default: return "Unknown";
+    }
+}
+
+static Color GetEnemyColor(EnemyType type)
+{
+    switch (type)
+    {
+        case ENEMY_GOBLIN: return GREEN;
+        case ENEMY_BANDIT: return ORANGE;
+        case ENEMY_SKELETON: return LIGHTGRAY;
+        case ENEMY_ELITE: return PURPLE;
+        default: return RED;
+    }
+}
 
 void InitEnemy(
     Enemy *enemy,
     float x,
-    float y
+    float y,
+    EnemyType type
 )
 {
     enemy->body = (Rectangle)
@@ -14,16 +40,53 @@ void InitEnemy(
         60
     };
 
-    enemy->hp = 30;
-    enemy->maxHp = 30;
-
+    enemy->type = type;
     enemy->alive = true;
-
     enemy->respawnTimer = 0;
-
-    enemy->speed = 2.0f;
-
     enemy->direction = 1;
+
+    switch (type)
+    {
+        case ENEMY_GOBLIN:
+            enemy->hp = 30;
+            enemy->maxHp = 30;
+            enemy->damage = 2;
+            enemy->xpReward = 25;
+            enemy->speed = 1.5f;
+            break;
+
+        case ENEMY_BANDIT:
+            enemy->hp = 50;
+            enemy->maxHp = 50;
+            enemy->damage = 4;
+            enemy->xpReward = 50;
+            enemy->speed = 2.0f;
+            break;
+
+        case ENEMY_SKELETON:
+            enemy->hp = 80;
+            enemy->maxHp = 80;
+            enemy->damage = 6;
+            enemy->xpReward = 100;
+            enemy->speed = 1.2f;
+            break;
+
+        case ENEMY_ELITE:
+            enemy->hp = 150;
+            enemy->maxHp = 150;
+            enemy->damage = 10;
+            enemy->xpReward = 250;
+            enemy->speed = 2.5f;
+            break;
+
+        default:
+            enemy->hp = 30;
+            enemy->maxHp = 30;
+            enemy->damage = 2;
+            enemy->xpReward = 25;
+            enemy->speed = 1.5f;
+            break;
+    }
 }
 
 void UpdateEnemy(Enemy *enemy, Vector2 playerPos)
@@ -75,5 +138,28 @@ void DrawEnemy(Enemy enemy)
     if (!enemy.alive)
         return;
 
-    DrawRectangleRec(enemy.body, RED);
+    const char *typeName = GetEnemyTypeName(enemy.type);
+    Color enemyColor = GetEnemyColor(enemy.type);
+    char hpText[32];
+
+    snprintf(hpText, sizeof(hpText), "HP: %i", enemy.hp);
+
+    int typeTextWidth = MeasureText(typeName, 20);
+    int hpTextWidth = MeasureText(hpText, 18);
+
+    DrawRectangleRec(enemy.body, enemyColor);
+
+    DrawText(typeName,
+        (int)(enemy.body.x + (enemy.body.width - typeTextWidth) / 2),
+        (int)(enemy.body.y - 34),
+        20,
+        BLACK
+    );
+
+    DrawText(hpText,
+        (int)(enemy.body.x + (enemy.body.width - hpTextWidth) / 2),
+        (int)(enemy.body.y - 16),
+        18,
+        BLACK
+    );
 }

@@ -26,11 +26,11 @@ int main(void)
 
     Enemy enemies[MAX_ENEMIES];
 
-    InitEnemy(&enemies[0], 800, 540);
-    InitEnemy(&enemies[1], 1200, 540);
-    InitEnemy(&enemies[2], 1700, 540);
-    InitEnemy(&enemies[3], 2200, 540);
-    InitEnemy(&enemies[4], 2800, 540);
+    InitEnemy(&enemies[0], 800, 540, ENEMY_GOBLIN);
+    InitEnemy(&enemies[1], 1200, 540, ENEMY_BANDIT);
+    InitEnemy(&enemies[2], 1700, 540, ENEMY_SKELETON);
+    InitEnemy(&enemies[3], 2200, 540, ENEMY_ELITE);
+    InitEnemy(&enemies[4], 2800, 540, ENEMY_GOBLIN);
 
     InitMap();
 
@@ -143,7 +143,7 @@ int main(void)
                         )
                     )
                     {
-                        player.stats.hp--;
+                        player.stats.hp -= enemies[i].damage;
 
                         if (player.stats.hp < 0)
                         {
@@ -190,7 +190,7 @@ int main(void)
 
                                 AddXP(
                                     &player.stats,
-                                    50
+                                    enemies[i].xpReward
                                 );
 
                                 GenerateEnemyDrops(&player.inventory);
@@ -222,11 +222,11 @@ int main(void)
                     UnloadPlayer(&player);
                     InitPlayer(&player);
 
-                    InitEnemy(&enemies[0], 800, 540);
-                    InitEnemy(&enemies[1], 1200, 540);
-                    InitEnemy(&enemies[2], 1700, 540);
-                    InitEnemy(&enemies[3], 2200, 540);
-                    InitEnemy(&enemies[4], 2800, 540);
+                    InitEnemy(&enemies[0], 800, 540, ENEMY_GOBLIN);
+                    InitEnemy(&enemies[1], 1200, 540, ENEMY_BANDIT);
+                    InitEnemy(&enemies[2], 1700, 540, ENEMY_SKELETON);
+                    InitEnemy(&enemies[3], 2200, 540, ENEMY_ELITE);
+                    InitEnemy(&enemies[4], 2800, 540, ENEMY_GOBLIN);
 
                     currentScreen = SCREEN_MENU;
                 }
@@ -401,12 +401,23 @@ int main(void)
                 );
 
                 int aliveEnemies = 0;
+                int goblinsAlive = 0;
+                int banditsAlive = 0;
+                int skeletonsAlive = 0;
+                int elitesAlive = 0;
 
                 for (int i = 0; i < MAX_ENEMIES; i++)
                 {
-                    if (enemies[i].alive)
+                    if (!enemies[i].alive) continue;
+
+                    aliveEnemies++;
+
+                    switch (enemies[i].type)
                     {
-                        aliveEnemies++;
+                        case ENEMY_GOBLIN: goblinsAlive++; break;
+                        case ENEMY_BANDIT: banditsAlive++; break;
+                        case ENEMY_SKELETON: skeletonsAlive++; break;
+                        case ENEMY_ELITE: elitesAlive++; break;
                     }
                 }
 
@@ -419,6 +430,50 @@ int main(void)
                     450,
                     20,
                     RED
+                );
+
+                DrawText(
+                    TextFormat(
+                        "Goblins: %i",
+                        goblinsAlive
+                    ),
+                    20,
+                    480,
+                    20,
+                    DARKGREEN
+                );
+
+                DrawText(
+                    TextFormat(
+                        "Bandits: %i",
+                        banditsAlive
+                    ),
+                    20,
+                    510,
+                    20,
+                    ORANGE
+                );
+
+                DrawText(
+                    TextFormat(
+                        "Skeletons: %i",
+                        skeletonsAlive
+                    ),
+                    20,
+                    540,
+                    20,
+                    LIGHTGRAY
+                );
+
+                DrawText(
+                    TextFormat(
+                        "Elites: %i",
+                        elitesAlive
+                    ),
+                    20,
+                    570,
+                    20,
+                    PURPLE
                 );
 
                 if (inventoryOpen)
