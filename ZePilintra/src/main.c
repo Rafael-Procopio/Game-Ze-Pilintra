@@ -2,6 +2,7 @@
 #include "game.h"
 #include "player.h"
 #include "inventory.h"
+#include "drops.h"
 #include "map.h"
 #include "stats.h"
 #include "enemy.h"
@@ -21,6 +22,7 @@ int main(void)
 
     Player player;
     InitPlayer(&player);
+    InitDropNotification();
 
     Enemy enemies[MAX_ENEMIES];
 
@@ -190,6 +192,8 @@ int main(void)
                                     &player.stats,
                                     50
                                 );
+
+                                GenerateEnemyDrops(&player.inventory);
                             }
                         }
                     }
@@ -205,6 +209,8 @@ int main(void)
                     player.body.x + player.body.width / 2,
                     player.body.y + player.body.height / 2
                 };
+
+                UpdateDropNotification(GetFrameTime());
 
                 break;
             }
@@ -419,6 +425,8 @@ int main(void)
                 {
                     DrawInventory(player.inventory);
                 }
+
+                DrawDropNotification();
 
                 break;
             }
