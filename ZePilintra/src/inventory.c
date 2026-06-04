@@ -75,7 +75,7 @@ bool RemoveItem(Inventory *inventory, const char *name, int quantity)
     return false;
 }
 
-void DrawInventory(Inventory inventory)
+void DrawInventory(Inventory inventory, int selectedIndex)
 {
     const int width = 720;
     const int height = 520;
@@ -88,22 +88,35 @@ void DrawInventory(Inventory inventory)
 
     DrawText("Inventory", x + 24, y + 24, 40, BLACK);
     DrawText("[I] Close Inventory", x + 24, y + 70, 20, DARKGRAY);
+    DrawText("[UP/DOWN] Select Item  [ENTER] Equip", x + 24, y + 100, 20, DARKGRAY);
 
     if (inventory.itemCount == 0)
     {
-        DrawText("Empty", x + 24, y + 120, 30, DARKGRAY);
+        DrawText("Empty", x + 24, y + 140, 30, DARKGRAY);
         return;
     }
 
+    if (selectedIndex < 0) selectedIndex = 0;
+    if (selectedIndex >= inventory.itemCount) selectedIndex = inventory.itemCount - 1;
+
     for (int i = 0; i < inventory.itemCount; i++)
     {
-        int itemY = y + 120 + i * 30;
+        int itemY = y + 140 + i * 30;
+        bool isSelected = i == selectedIndex;
+        int textX = x + 24;
+
+        if (isSelected)
+        {
+            DrawText(">", x + 14, itemY, 24, BLUE);
+            textX += 20;
+        }
+
         DrawText(
             TextFormat("[%i] %s x%i", i + 1, inventory.slots[i].name, inventory.slots[i].quantity),
-            x + 24,
+            textX,
             itemY,
             24,
-            BLACK
+            isSelected ? BLUE : BLACK
         );
     }
 }

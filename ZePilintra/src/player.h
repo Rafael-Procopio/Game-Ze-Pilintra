@@ -4,6 +4,7 @@
 #include "raylib.h"
 #include "stats.h"
 #include "inventory.h"
+#include "equipment.h"
 
 typedef enum
 {
@@ -12,7 +13,7 @@ typedef enum
     PLAYER_ATTACK
 } PlayerAnimationState;
 
-typedef struct
+typedef struct Player
 {
     Rectangle body;
 
@@ -37,6 +38,7 @@ typedef struct
 
     Stats stats;
     Inventory inventory;
+    Equipment equipment;
 
 } Player;
 

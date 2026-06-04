@@ -2,6 +2,7 @@
 #include "stats.h"
 #include "map.h"
 #include "inventory.h"
+#include "equipment.h"
 #include <stdio.h>
 
 #define GRAVITY 0.5f
@@ -55,6 +56,7 @@ void InitPlayer(Player *player)
 
     InitStats(&player->stats);
     InitInventory(&player->inventory);
+    InitEquipment(&player->equipment);
 }
 
 // Helper function to update animation frames

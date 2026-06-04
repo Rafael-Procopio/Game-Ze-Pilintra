@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "game.h"
 #include "player.h"
+#include "equipment.h"
 #include "inventory.h"
 #include "drops.h"
 #include "map.h"
@@ -19,7 +20,10 @@ int main(void)
 
     GameScreen currentScreen = SCREEN_MENU;
     bool inventoryOpen = false;
+    bool equipmentOpen = false;
     bool godMode = false;
+    int inventorySelectedIndex = 0;
+    int equipmentSelectedSlot = 0;
 
     Player player;
     InitPlayer(&player);
@@ -78,6 +82,26 @@ int main(void)
                 if (IsKeyPressed(KEY_I))
                 {
                     inventoryOpen = !inventoryOpen;
+                    if (inventoryOpen)
+                    {
+                        if (player.inventory.itemCount <= 0)
+                        {
+                            inventorySelectedIndex = 0;
+                        }
+                        else if (inventorySelectedIndex >= player.inventory.itemCount)
+                        {
+                            inventorySelectedIndex = player.inventory.itemCount - 1;
+                        }
+                    }
+                }
+
+                if (IsKeyPressed(KEY_E))
+                {
+                    equipmentOpen = !equipmentOpen;
+                    if (equipmentOpen)
+                    {
+                        equipmentSelectedSlot = 0;
+                    }
                 }
 
                 // Test item pickup keys
@@ -96,12 +120,96 @@ int main(void)
                     AddItem(&player.inventory, "Iron Sword", 1);
                 }
 
+                if (IsKeyPressed(KEY_F5))
+                {
+                    AddItem(&player.inventory, "Iron Sword", 1);
+                }
+
+                if (IsKeyPressed(KEY_F6))
+                {
+                    AddItem(&player.inventory, "Leather Armor", 1);
+                }
+
+                if (IsKeyPressed(KEY_F7))
+                {
+                    AddItem(&player.inventory, "Lucky Ring", 1);
+                }
+
+                if (IsKeyPressed(KEY_F8))
+                {
+                    AddItem(&player.inventory, "Steel Sword", 1);
+                }
+
                 if (IsKeyPressed(KEY_F10))
                 {
                     godMode = !godMode;
                     if (godMode && player.stats.hp <= 0)
                     {
                         player.stats.hp = 1;
+                    }
+                }
+
+                if (inventoryOpen)
+                {
+                    if (IsKeyPressed(KEY_UP))
+                    {
+                        if (player.inventory.itemCount > 0)
+                        {
+                            inventorySelectedIndex--;
+                            if (inventorySelectedIndex < 0)
+                                inventorySelectedIndex = player.inventory.itemCount - 1;
+                        }
+                    }
+
+                    if (IsKeyPressed(KEY_DOWN))
+                    {
+                        if (player.inventory.itemCount > 0)
+                        {
+                            inventorySelectedIndex++;
+                            if (inventorySelectedIndex >= player.inventory.itemCount)
+                                inventorySelectedIndex = 0;
+                        }
+                    }
+
+                    if (IsKeyPressed(KEY_ENTER) && player.inventory.itemCount > 0)
+                    {
+                        if (EquipItem(&player, player.inventory.slots[inventorySelectedIndex].name))
+                        {
+                            if (player.inventory.itemCount == 0)
+                            {
+                                inventorySelectedIndex = 0;
+                            }
+                            else if (inventorySelectedIndex >= player.inventory.itemCount)
+                            {
+                                inventorySelectedIndex = player.inventory.itemCount - 1;
+                            }
+                        }
+                    }
+                }
+                else if (equipmentOpen)
+                {
+                    if (IsKeyPressed(KEY_UP))
+                    {
+                        equipmentSelectedSlot--;
+                        if (equipmentSelectedSlot < 0)
+                            equipmentSelectedSlot = 2;
+                    }
+
+                    if (IsKeyPressed(KEY_DOWN))
+                    {
+                        equipmentSelectedSlot++;
+                        if (equipmentSelectedSlot > 2)
+                            equipmentSelectedSlot = 0;
+                    }
+
+                    if (IsKeyPressed(KEY_U))
+                    {
+                        switch (equipmentSelectedSlot)
+                        {
+                            case 0: UnequipWeapon(&player); break;
+                            case 1: UnequipArmor(&player); break;
+                            case 2: UnequipAccessory(&player); break;
+                        }
                     }
                 }
 
@@ -194,7 +302,7 @@ int main(void)
                             )
                         )
                         {
-                            enemies[i].hp -= player.stats.attack;
+                            enemies[i].hp -= GetPlayerAttackValue(&player);
 
                             if (enemies[i].hp <= 0)
                             {
@@ -228,6 +336,7 @@ int main(void)
                 };
 
                 UpdateDropNotification(GetFrameTime());
+                UpdateEquipmentNotification(GetFrameTime());
 
                 break;
             }
@@ -410,9 +519,33 @@ int main(void)
                 );
 
                 DrawText(
-                    "F1 = Add Potion | F2 = Add Gold Coin | F3 = Add Iron Sword",
+                    "E = Abrir/Fechar Equipment",
                     20,
                     550,
+                    20,
+                    DARKBLUE
+                );
+
+                DrawText(
+                    "F1 = Add Potion | F2 = Add Gold Coin | F3 = Add Iron Sword",
+                    20,
+                    580,
+                    20,
+                    DARKGRAY
+                );
+
+                DrawText(
+                    "F5 = Add Iron Sword | F6 = Add Leather Armor | F7 = Add Lucky Ring | F8 = Add Steel Sword",
+                    20,
+                    610,
+                    20,
+                    DARKGRAY
+                );
+
+                DrawText(
+                    "[UP/DOWN] select item or slot | ENTER = Equip | U = Unequip",
+                    20,
+                    640,
                     20,
                     DARKGRAY
                 );
@@ -420,7 +553,7 @@ int main(void)
                 DrawText(
                     "F10 = Toggle God Mode",
                     20,
-                    580,
+                    640,
                     20,
                     DARKBLUE
                 );
@@ -428,7 +561,7 @@ int main(void)
                 DrawText(
                     TextFormat("God Mode: %s", godMode ? "ON" : "OFF"),
                     20,
-                    610,
+                    670,
                     20,
                     godMode ? GREEN : RED
                 );
@@ -511,7 +644,14 @@ int main(void)
 
                 if (inventoryOpen)
                 {
-                    DrawInventory(player.inventory);
+                    DrawInventory(player.inventory, inventorySelectedIndex);
+                }
+
+                if (equipmentOpen)
+                {
+                    DrawEquipmentPanel(&player.equipment, equipmentSelectedSlot);
+                    DrawEquipmentBonusPanel(&player.equipment);
+                    DrawCharacterPanel(&player);
                 }
 
                 DrawDropNotification();
