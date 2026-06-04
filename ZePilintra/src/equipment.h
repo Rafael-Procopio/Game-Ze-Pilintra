@@ -2,14 +2,7 @@
 #define EQUIPMENT_H
 
 #include <stdbool.h>
-
-typedef enum
-{
-    ITEM_CONSUMABLE,
-    ITEM_WEAPON,
-    ITEM_ARMOR,
-    ITEM_ACCESSORY
-} ItemType;
+#include "items.h"
 
 typedef struct
 {

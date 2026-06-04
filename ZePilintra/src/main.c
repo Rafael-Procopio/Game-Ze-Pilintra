@@ -173,8 +173,24 @@ int main(void)
 
                     if (IsKeyPressed(KEY_ENTER) && player.inventory.itemCount > 0)
                     {
-                        if (EquipItem(&player, player.inventory.slots[inventorySelectedIndex].name))
+                        // Try to use consumable first, otherwise attempt to equip
+                        if (!UseItem(&player.inventory, &player, inventorySelectedIndex))
                         {
+                            if (EquipItem(&player, player.inventory.slots[inventorySelectedIndex].name))
+                            {
+                                if (player.inventory.itemCount == 0)
+                                {
+                                    inventorySelectedIndex = 0;
+                                }
+                                else if (inventorySelectedIndex >= player.inventory.itemCount)
+                                {
+                                    inventorySelectedIndex = player.inventory.itemCount - 1;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // After using, clamp selected index
                             if (player.inventory.itemCount == 0)
                             {
                                 inventorySelectedIndex = 0;
@@ -337,6 +353,7 @@ int main(void)
 
                 UpdateDropNotification(GetFrameTime());
                 UpdateEquipmentNotification(GetFrameTime());
+                UpdateHealEffects(GetFrameTime());
 
                 break;
             }
@@ -646,6 +663,8 @@ int main(void)
                 {
                     DrawInventory(player.inventory, inventorySelectedIndex);
                 }
+
+                DrawHealEffects();
 
                 if (equipmentOpen)
                 {

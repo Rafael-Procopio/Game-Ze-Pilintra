@@ -4,6 +4,7 @@
 #include "inventory.h"
 #include "equipment.h"
 #include <stdio.h>
+#include <string.h>
 
 #define GRAVITY 0.5f
 
@@ -234,5 +235,112 @@ void UnloadPlayer(Player *player)
     if (player->texture.id > 0)
     {
         UnloadTexture(player->texture);
+    }
+}
+
+// Heal notification system
+#define HEAL_NOTIFICATION_LENGTH 128
+#define HEAL_NOTIFICATION_DURATION 2.5f
+#define MAX_HEAL_EFFECTS 6
+
+typedef struct
+{
+    char text[HEAL_NOTIFICATION_LENGTH];
+    float timer;
+    int healAmount;
+    bool active;
+} HealNotification;
+
+static HealNotification healNotification = { 0 };
+
+typedef struct
+{
+    int amount;
+    float timer;
+    float offsetY;
+    bool active;
+} HealEffect;
+
+static HealEffect healEffects[MAX_HEAL_EFFECTS];
+
+void SetHealNotification(const char *message, int healAmount)
+{
+    if (message == NULL) return;
+    strncpy(healNotification.text, message, HEAL_NOTIFICATION_LENGTH - 1);
+    healNotification.text[HEAL_NOTIFICATION_LENGTH - 1] = '\0';
+    healNotification.healAmount = healAmount;
+    healNotification.timer = HEAL_NOTIFICATION_DURATION;
+    healNotification.active = true;
+}
+
+void SpawnHealEffect(Player *player, int amount)
+{
+    if (player == NULL || amount <= 0) return;
+
+    for (int i = 0; i < MAX_HEAL_EFFECTS; i++)
+    {
+        if (!healEffects[i].active)
+        {
+            healEffects[i].active = true;
+            healEffects[i].amount = amount;
+            healEffects[i].timer = 1.5f;
+            healEffects[i].offsetY = 0.0f + i * 12.0f; // stack
+            break;
+        }
+    }
+}
+
+void UpdateHealEffects(float delta)
+{
+    if (healNotification.active)
+    {
+        healNotification.timer -= delta;
+        if (healNotification.timer <= 0.0f)
+        {
+            healNotification.active = false;
+            healNotification.text[0] = '\0';
+        }
+    }
+
+    for (int i = 0; i < MAX_HEAL_EFFECTS; i++)
+    {
+        if (!healEffects[i].active) continue;
+        healEffects[i].timer -= delta;
+        healEffects[i].offsetY -= 20.0f * delta; // move up
+        if (healEffects[i].timer <= 0.0f)
+        {
+            healEffects[i].active = false;
+        }
+    }
+}
+
+void DrawHealEffects(void)
+{
+    // Draw notification panel (Used X / +Y HP)
+    if (healNotification.active)
+    {
+        int width = 300;
+        int height = 48;
+        int x = 30;
+        int y = 520;
+
+        DrawRectangle(x, y, width, height, Fade(BLACK, 0.75f));
+        DrawRectangleLines(x, y, width, height, WHITE);
+        DrawText(healNotification.text, x + 12, y + 8, 20, WHITE);
+        if (healNotification.healAmount > 0)
+        {
+            DrawText(TextFormat("+%i HP", healNotification.healAmount), x + 12, y + 28, 18, LIME);
+        }
+    }
+
+    // Draw floating heal effects near HUD (top-left HP area)
+    int baseX = 140;
+    int baseY = 120;
+    for (int i = 0; i < MAX_HEAL_EFFECTS; i++)
+    {
+        if (!healEffects[i].active) continue;
+        float alpha = healEffects[i].timer / 1.5f;
+        Color c = Fade(LIME, alpha);
+        DrawText(TextFormat("+%i HP", healEffects[i].amount), baseX, (int)(baseY + healEffects[i].offsetY), 22, c);
     }
 }

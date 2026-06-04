@@ -47,4 +47,10 @@ void UpdatePlayer(Player *player);
 void DrawPlayer(Player player);
 void UnloadPlayer(Player *player);
 
+// Consumable / heal notifications
+void SetHealNotification(const char *message, int healAmount);
+void SpawnHealEffect(Player *player, int amount);
+void UpdateHealEffects(float delta);
+void DrawHealEffects(void);
+
 #endif

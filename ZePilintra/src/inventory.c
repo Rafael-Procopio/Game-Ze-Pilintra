@@ -1,6 +1,8 @@
 #include "inventory.h"
 #include "raylib.h"
+#include "player.h"
 #include <string.h>
+#include <stdio.h>
 
 void InitInventory(Inventory *inventory)
 {
@@ -119,4 +121,66 @@ void DrawInventory(Inventory inventory, int selectedIndex)
             isSelected ? BLUE : BLACK
         );
     }
+}
+
+// Consumable definitions
+typedef struct
+{
+    const char *name;
+    int healAmount;
+} ConsumableDef;
+
+static const ConsumableDef consumables[] =
+{
+    { "Potion", 25 },
+    { "Greater Potion", 75 }
+};
+
+static const int consumableCount = sizeof(consumables) / sizeof(consumables[0]);
+
+static int GetConsumableHealAmount(const char *name)
+{
+    if (name == NULL) return 0;
+    for (int i = 0; i < consumableCount; i++)
+    {
+        if (strcmp(consumables[i].name, name) == 0)
+            return consumables[i].healAmount;
+    }
+    return 0;
+}
+
+bool UseItem(Inventory *inventory, struct Player *player, int slotIndex)
+{
+    if (inventory == NULL || player == NULL) return false;
+    if (slotIndex < 0 || slotIndex >= inventory->itemCount) return false;
+
+    Item *it = &inventory->slots[slotIndex];
+    if (it->quantity <= 0) return false;
+
+    int heal = GetConsumableHealAmount(it->name);
+    if (heal <= 0) return false; // Not a consumable
+
+    // Apply heal with clamp to player's max HP
+    int oldHp = player->stats.hp;
+    int maxHp = GetPlayerMaxHpValue(player);
+    int amount = heal;
+    if (oldHp >= maxHp) amount = 0;
+    if (oldHp + amount > maxHp) amount = maxHp - oldHp;
+
+    if (amount > 0)
+    {
+        player->stats.hp += amount;
+        if (player->stats.hp > maxHp) player->stats.hp = maxHp;
+    }
+
+    // Reduce quantity and remove slot if needed
+    RemoveItem(inventory, it->name, 1);
+
+    // Show notifications and floating text
+    char buf[128];
+    snprintf(buf, sizeof(buf), "Used %s", it->name);
+    SetHealNotification(buf, amount);
+    SpawnHealEffect(player, amount);
+
+    return true;
 }
