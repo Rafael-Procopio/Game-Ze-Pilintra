@@ -1,6 +1,7 @@
 #include "player.h"
 #include "stats.h"
 #include "map.h"
+#include "inventory.h"
 #include <stdio.h>
 
 #define GRAVITY 0.5f
@@ -53,6 +54,7 @@ void InitPlayer(Player *player)
     player->attackTimer = 0.0f;
 
     InitStats(&player->stats);
+    InitInventory(&player->inventory);
 }
 
 // Helper function to update animation frames

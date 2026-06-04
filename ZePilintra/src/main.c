@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "game.h"
 #include "player.h"
+#include "inventory.h"
 #include "map.h"
 #include "stats.h"
 #include "enemy.h"
@@ -16,6 +17,7 @@ int main(void)
     SetExitKey(KEY_NULL);
 
     GameScreen currentScreen = SCREEN_MENU;
+    bool inventoryOpen = false;
 
     Player player;
     InitPlayer(&player);
@@ -68,6 +70,27 @@ int main(void)
                 if (IsKeyPressed(KEY_ESCAPE))
                 {
                     currentScreen = SCREEN_MENU;
+                }
+
+                if (IsKeyPressed(KEY_I))
+                {
+                    inventoryOpen = !inventoryOpen;
+                }
+
+                // Test item pickup keys
+                if (IsKeyPressed(KEY_F1))
+                {
+                    AddItem(&player.inventory, "Potion", 1);
+                }
+
+                if (IsKeyPressed(KEY_F2))
+                {
+                    AddItem(&player.inventory, "Gold Coin", 1);
+                }
+
+                if (IsKeyPressed(KEY_F3))
+                {
+                    AddItem(&player.inventory, "Iron Sword", 1);
                 }
 
                 // XP de teste
@@ -355,6 +378,22 @@ int main(void)
                     DARKBLUE
                 );
 
+                DrawText(
+                    "I = Abrir/Fechar Inventario",
+                    20,
+                    520,
+                    20,
+                    DARKBLUE
+                );
+
+                DrawText(
+                    "F1 = Add Potion | F2 = Add Gold Coin | F3 = Add Iron Sword",
+                    20,
+                    550,
+                    20,
+                    DARKGRAY
+                );
+
                 int aliveEnemies = 0;
 
                 for (int i = 0; i < MAX_ENEMIES; i++)
@@ -375,6 +414,11 @@ int main(void)
                     20,
                     RED
                 );
+
+                if (inventoryOpen)
+                {
+                    DrawInventory(player.inventory);
+                }
 
                 break;
             }

@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "stats.h"
+#include "inventory.h"
 
 typedef enum
 {
@@ -35,6 +36,7 @@ typedef struct
     float attackTimer;
 
     Stats stats;
+    Inventory inventory;
 
 } Player;
 
