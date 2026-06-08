@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "raylib.h"
 #include "game.h"
 #include "player.h"
@@ -9,6 +11,7 @@
 #include "enemy.h"
 #include "combat.h"
 #include "wave.h"
+#include "logic.h"
 
 int main(void)
 {
@@ -25,6 +28,16 @@ int main(void)
     bool godMode = false;
     int inventorySelectedIndex = 0;
     int equipmentSelectedSlot = 0;
+
+    LogicQuestion currentQuestion;
+    int logicCorrect = 0;
+    int logicWrong = 0;
+    int logicRewardXP = 100;
+    int lastLogicWave = 0;
+    bool logicChallengeActive = false;
+    bool lastLogicAnswerCorrect = false;
+    char logicResultText[100];
+    LogicQuestionType correctAnswer;
 
     Player player;
     InitPlayer(&player);
@@ -91,6 +104,12 @@ int main(void)
                             inventorySelectedIndex = player.inventory.itemCount - 1;
                         }
                     }
+                }
+
+                if (IsKeyPressed(KEY_L))
+                {
+                    currentQuestion = GetRandomQuestion();
+                    currentScreen = SCREEN_LOGIC_CHALLENGE;
                 }
 
                 if (IsKeyPressed(KEY_E))
@@ -354,6 +373,21 @@ int main(void)
                 UpdateHealEffects(GetFrameTime());
                 UpdateWaveSystem(&wave, GetFrameTime(), enemies, &player);
 
+                if (
+                    wave.currentWave % 3 == 0 &&
+                    wave.currentWave != 0 &&
+                    wave.currentWave != lastLogicWave
+                )
+                {
+                    lastLogicWave = wave.currentWave;
+
+                    logicRewardXP = wave.currentWave * 50;
+
+                    currentQuestion = GetRandomQuestion();
+
+                    currentScreen = SCREEN_LOGIC_CHALLENGE;
+                }
+
                 break;
             }
 
@@ -378,6 +412,115 @@ int main(void)
             {
                 break;
             }
+
+            case SCREEN_LOGIC_CHALLENGE:
+            {
+                if (IsKeyPressed(KEY_ONE))
+                {
+                    if (currentQuestion.answer == LOGIC_TAUTOLOGY)
+                    {
+                        logicCorrect++;
+
+                        AddXP(
+                            &player.stats,
+                            logicRewardXP
+                        );
+
+                        lastLogicAnswerCorrect = true;
+
+                        sprintf(
+                            logicResultText,
+                            "+%d XP",
+                            logicRewardXP
+                        );
+                    }
+                    else
+                    {
+                        logicWrong++;
+
+                        lastLogicAnswerCorrect = false;
+
+                        correctAnswer = currentQuestion.answer;
+                    }
+
+                    currentScreen = SCREEN_LOGIC_RESULT;
+                }
+
+                if (IsKeyPressed(KEY_TWO))
+                {
+                    if (currentQuestion.answer == LOGIC_CONTRADICTION)
+                    {
+                        logicCorrect++;
+
+                        AddXP(
+                            &player.stats,
+                            logicRewardXP
+                        );
+
+                        lastLogicAnswerCorrect = true;
+
+                        sprintf(
+                            logicResultText,
+                            "+%d XP",
+                            logicRewardXP
+                        );
+                    }
+                    else
+                    {
+                        logicWrong++;
+
+                        lastLogicAnswerCorrect = false;
+
+                        correctAnswer = currentQuestion.answer;
+                    }
+
+                    currentScreen = SCREEN_LOGIC_RESULT;
+                }
+
+                if (IsKeyPressed(KEY_THREE))
+                {
+                    if (currentQuestion.answer == LOGIC_CONTINGENCY)
+                    {
+                        logicCorrect++;
+
+                        AddXP(
+                            &player.stats,
+                            logicRewardXP
+                        );
+
+                        lastLogicAnswerCorrect = true;
+
+                        sprintf(
+                            logicResultText,
+                            "+%d XP",
+                            logicRewardXP
+                        );
+                    }
+                    else
+                    {
+                        logicWrong++;
+
+                        lastLogicAnswerCorrect = false;
+
+                        correctAnswer = currentQuestion.answer;
+                    }
+
+                    currentScreen = SCREEN_LOGIC_RESULT;
+                }
+
+                break;
+            }
+
+            case SCREEN_LOGIC_RESULT:
+            {
+                if (IsKeyPressed(KEY_ENTER))
+                {
+                    currentScreen = SCREEN_GAME;
+                }
+
+                break;
+            }
+
         }
 
         BeginDrawing();
@@ -712,6 +855,135 @@ int main(void)
 
                 break;
             }
+
+            case SCREEN_LOGIC_CHALLENGE:
+            {
+                DrawText(
+                    TextFormat("Reward: %d XP", logicRewardXP),
+                    300,
+                    270,
+                    25,
+                    DARKGREEN
+                );
+                
+                DrawText(
+                    "LOGIC CHALLENGE",
+                    350,
+                    100,
+                    40,
+                    BLACK
+                );
+
+                DrawText(
+                    currentQuestion.proposition,
+                    300,
+                    220,
+                    40,
+                    DARKBLUE
+                );
+
+                DrawText(
+                    "1 - Tautology",
+                    300,
+                    320,
+                    30,
+                    BLACK
+                );
+
+                DrawText(
+                    "2 - Contradiction",
+                    300,
+                    370,
+                    30,
+                    BLACK
+                );
+
+                DrawText(
+                    "3 - Contingency",
+                    300,
+                    420,
+                    30,
+                    BLACK
+                );
+
+                break;
+            }
+
+            case SCREEN_LOGIC_RESULT:
+            {
+                if (lastLogicAnswerCorrect)
+                {
+                    DrawText(
+                        "CORRETO!",
+                        450,
+                        180,
+                        50,
+                        DARKGREEN
+                    );
+
+                    DrawText(
+                        logicResultText,
+                        500,
+                        260,
+                        40,
+                        GREEN
+                    );
+                }
+                else
+                {
+                    DrawText(
+                        "INCORRETO!",
+                        430,
+                        180,
+                        50,
+                        RED
+                    );
+
+                    DrawText(
+                        "Resposta correta:",
+                        420,
+                        260,
+                        35,
+                        BLACK
+                    );
+
+                    const char *answerText = "";
+
+                    switch (correctAnswer)
+                    {
+                        case LOGIC_TAUTOLOGY:
+                            answerText = "TAUTOLOGY";
+                            break;
+
+                        case LOGIC_CONTRADICTION:
+                            answerText = "CONTRADICTION";
+                            break;
+
+                        case LOGIC_CONTINGENCY:
+                            answerText = "CONTINGENCY";
+                            break;
+                    }
+
+                    DrawText(
+                        answerText,
+                        450,
+                        320,
+                        40,
+                        BLUE
+                    );
+                }
+
+                DrawText(
+                    "ENTER para continuar",
+                    400,
+                    450,
+                    30,
+                    DARKGRAY
+                );
+
+                break;
+            }
+
         }
 
         EndDrawing();
