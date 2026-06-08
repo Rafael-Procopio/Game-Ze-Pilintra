@@ -19,6 +19,7 @@ int main(void)
     const int screenHeight = 720;
 
     InitWindow(screenWidth, screenHeight, "Ze Pilintra");
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
 
@@ -26,6 +27,7 @@ int main(void)
     bool inventoryOpen = false;
     bool equipmentOpen = false;
     bool godMode = false;
+    bool showControls = false;
     int inventorySelectedIndex = 0;
     int equipmentSelectedSlot = 0;
 
@@ -119,6 +121,16 @@ int main(void)
                     {
                         equipmentSelectedSlot = 0;
                     }
+                }
+
+                if (IsKeyPressed(KEY_F11))
+                {
+                    ToggleFullscreen();
+                }
+
+                if (IsKeyPressed(KEY_H))
+                {
+                    showControls = !showControls;
                 }
 
                 // Test item pickup keys
@@ -628,89 +640,9 @@ int main(void)
                 );
 
                 DrawText(
-                    "J = Atacar",
+                    "[H] Controls",
+                    GetScreenWidth() - 180,
                     20,
-                    250,
-                    20,
-                    DARKGRAY
-                );
-
-                DrawText(
-                    "K = Ganhar XP",
-                    20,
-                    280,
-                    20,
-                    DARKGRAY
-                );
-
-                DrawText(
-                    "1 = +Ataque",
-                    20,
-                    350,
-                    20,
-                    DARKBLUE
-                );
-
-                DrawText(
-                    "2 = +Defesa",
-                    20,
-                    380,
-                    20,
-                    DARKBLUE
-                );
-
-                DrawText(
-                    "3 = +HP Max",
-                    20,
-                    410,
-                    20,
-                    DARKBLUE
-                );
-
-                DrawText(
-                    "I = Abrir/Fechar Inventario",
-                    20,
-                    520,
-                    20,
-                    DARKBLUE
-                );
-
-                DrawText(
-                    "E = Abrir/Fechar Equipment",
-                    20,
-                    550,
-                    20,
-                    DARKBLUE
-                );
-
-                DrawText(
-                    "F1 = Add Potion | F2 = Add Gold Coin | F3 = Add Iron Sword",
-                    20,
-                    580,
-                    20,
-                    DARKGRAY
-                );
-
-                DrawText(
-                    "F5 = Add Iron Sword | F6 = Add Leather Armor | F7 = Add Lucky Ring | F8 = Add Steel Sword",
-                    20,
-                    610,
-                    20,
-                    DARKGRAY
-                );
-
-                DrawText(
-                    "[UP/DOWN] select item or slot | ENTER = Equip | U = Unequip",
-                    20,
-                    640,
-                    20,
-                    DARKGRAY
-                );
-
-                DrawText(
-                    "F10 = Toggle God Mode",
-                    20,
-                    640,
                     20,
                     DARKBLUE
                 );
@@ -812,6 +744,42 @@ int main(void)
                     DrawEquipmentBonusPanel(&player.equipment);
                     DrawCharacterPanel(&player);
                 }
+
+                if (showControls)
+                {
+                    DrawRectangle(
+                        GetScreenWidth() - 350,
+                        50,
+                        320,
+                        300,
+                        Fade(BLACK, 0.8f)
+                    );
+
+                    DrawRectangleLines(
+                        GetScreenWidth() - 350,
+                        50,
+                        320,
+                        300,
+                        WHITE
+                    );
+
+                    DrawText("CONTROLS", GetScreenWidth() - 300, 70, 25, WHITE);
+
+                    DrawText("A/D - MOVE", GetScreenWidth() - 330, 110, 20, WHITE);
+                    DrawText("SPACE - JUMP", GetScreenWidth() - 330, 140, 20, WHITE);
+                    DrawText("J - ATTACK", GetScreenWidth() - 330, 170, 20, WHITE);
+                    DrawText("I - INVENTORY", GetScreenWidth() - 330, 200, 20, WHITE);
+                    DrawText("E - EQUIPMENT", GetScreenWidth() - 330, 230, 20, WHITE);
+                    DrawText("H - CLOSE PANEL", GetScreenWidth() - 330, 260, 20, WHITE);
+                    DrawText("F11 - FULLSCREEN", GetScreenWidth() - 330, 290, 20, WHITE);
+                    DrawText("F1-F10 - DEBUG ITEMS", GetScreenWidth() - 330, 320, 20, WHITE);
+                }
+
+                DrawWaveHUD(&wave);
+                DrawWaveAnnouncement(&wave);
+
+                DrawDropNotification();
+                DrawDropDebugPanel();
 
                 DrawWaveHUD(&wave);
                 DrawWaveAnnouncement(&wave);
